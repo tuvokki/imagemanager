@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The files</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="/kendo/assets/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="/kendo/assets/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="/kendo/assets/styles/kendo.metro.min.css" rel="stylesheet">
+    <link href="/kendo/assets/styles/kendo.dataviz.min.css" rel="stylesheet">
+    <link href="/kendo/assets/styles/kendo.dataviz.metro.min.css" rel="stylesheet">
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="/kendo/assets/js/kendo.all.min.js"></script><style type="text/css"></style>
+    <script src="/kendo/assets/js/kendo.timezones.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <div class="file-index-list" id="files">
+        <div id="listView"></div>
+        <div id="pager" class="k-pager-wrap"></div>
+        <a href="upload.html">Upload files</a>
+    </div>
+
+    <script type="text/x-kendo-template" id="template">
+        <div class="file">
+            <img src="#= thpath #" alt="#: name # image" class="filethumb"/>
+            #:name#
+            <!--div class="edit-buttons">
+                <span class="file-name">#:name#</span><a class="k-button k-button-icontext k-delete-button" href="\\#"><span class="k-icon k-delete"></span></a>
+            </div-->
+            <a href="#= path #"><p>Open image</p></a>
+        </div>
+    </script>
+
+    <script>
+    $(function() {
+        //See commented out edit-buttons in the template... something's not working
+        //function removeImage(e) {
+            // console.log("event :: click (" + $(e.event.target).closest(".k-button").attr("id") + ")" );
+            //console.log("log", e);
+            // dataSource.fetch(function() {
+            //   var filelist = dataSource.data();
+            //   // remove the first data item
+            //   dataSource.remove(filelist[0]);
+            //   // send the destroyed data item to the remote service
+            //   dataSource.sync();
+            // });
+        //}
+        //$(".k-delete-button").click(function(event) {
+            //console.log("log", event);
+        //});
+
+        var dataSource = new kendo.data.DataSource({
+            autoSync: true,
+            transport: {
+                read: {
+                    url: "index",
+                    dataType: "json"
+                },
+                destroy: function (options) {
+                    console.log("options", options);
+                  // make JSONP request to http://demos.kendoui.com/service/products/destroy
+                  // $.ajax({
+                  //   url: "http://demos.kendoui.com/service/products/destroy",
+                  //   dataType: "jsonp", // "jsonp" is required for cross-domain requests; use "json" for same-domain requests
+                  //   // send the destroyed data items as the "models" service parameter encoded in JSON
+                  //   data: {
+                  //     models: kendo.stringify(options.data.models)
+                  //   },
+                  //   success: function(result) {
+                  //     // notify the data source that the request succeeded
+                  //     options.success(result);
+                  //   },
+                  //   error: function(result) {
+                  //     // notify the data source that the request failed
+                  //     options.error(result);
+                  //   }
+                  // });
+                }
+                // destroy: {
+                //   url: "destroy",
+                //   dataType: "json"
+                //   // type: "POST"
+                // },
+                // parameterMap: function(options, operation) {
+                //     console.log("parameterMap: options", options);
+                //     console.log("parameterMap: operation", operation);
+                //     if (operation !== "read" && options.models) {
+                //         return {models: kendo.stringify(options.models)};
+                //     }
+                // }
+            },
+            pageSize: 5
+        });
+
+        $("#pager").kendoPager({
+            dataSource: dataSource
+        });
+
+        $("#listView").kendoListView({
+            dataSource: dataSource,
+            template: kendo.template($("#template").html())
+        });
+    });
+    </script>
+
+    <style scoped>
+        #files {
+            padding: 10px;
+            margin-bottom: -1px;
+            width: 733px;
+            height: 510px;
+            overflow: auto;
+        }
+        .file-index-list {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 3px 5px 0 0;
+            line-height: 1.1em;
+            font-size: .9em;
+            font-weight: normal;
+            color: #999;
+        }
+        #listView {
+            padding-left: 1px;
+            padding-top: 1px;
+        }
+        .file {
+            float: left;
+            position: relative;
+            width: 146px;
+            height: 205px;
+            margin: 0;
+            padding: 0;
+        }
+        .file img {
+            width: 145px;
+            height: 145px;
+        }
+        .file h3 {
+            margin: 0;
+            padding: 3px 5px 0 0;
+            max-width: 96px;
+            overflow: hidden;
+            line-height: 1.1em;
+            font-size: .9em;
+            font-weight: normal;
+            text-transform: uppercase;
+            color: #999;
+        }
+        .file a:link, a:visited, a:active, a:hover {
+            text-decoration: none;
+            background-color:#fff;
+            color:#999
+        }
+        .file p {
+            visibility: hidden;
+        }
+        .file:hover p {
+            visibility: visible;
+            position: absolute;
+            width: 145px;
+            height: 145px;
+            top: 0;
+            margin: 0;
+            padding: 0;
+            line-height: 110px;
+            vertical-align: middle;
+            text-align: center;
+            color: #fff;
+            background-color: rgba(0,0,0,0.5);
+            transition: background .2s linear, color .2s linear;
+            -moz-transition: background .2s linear, color .2s linear;
+            -webkit-transition: background .2s linear, color .2s linear;
+            -o-transition: background .2s linear, color .2s linear;
+        }
+        .edit-buttons .file-name {
+            line-height: 24px;
+            font-size: 1em;
+        }
+        .k-delete-button .k-icon {
+            margin-top: -0.7rem;
+        }
+        .k-delete-button{
+            margin-left: 15px;
+            width: 20px;
+            height: 20px;
+            cursor:pointer;
+            padding:0px 4px 2px 4px;
+            background:#fff;
+            border:1px solid white;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+            /*style the text*/
+            color:#f3f3f3;
+            font-size:1.1em;
+            /*border:1px solid crimson;*/
+            /*color:crimson;*/
+        }
+        .k-delete-button:hover {
+            border:1px solid crimson;
+            color:crimson;
+            background-color: #fff;
+        }
+        .k-listview:after {
+            content: ".";
+            display: block;
+            height: 0;
+            clear: both;
+            visibility: hidden;
+        }
+    </style>
+
+
+</body>
+</html>

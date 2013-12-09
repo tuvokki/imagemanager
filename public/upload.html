@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload a file or multiple</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="http://cdn.kendostatic.com/2013.3.1119/styles/kendo.common.min.css" rel="stylesheet">
+    <link href="http://cdn.kendostatic.com/2013.3.1119/styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="http://cdn.kendostatic.com/2013.3.1119/styles/kendo.metro.min.css" rel="stylesheet">
+    <link href="http://cdn.kendostatic.com/2013.3.1119/styles/kendo.dataviz.min.css" rel="stylesheet">
+    <link href="http://cdn.kendostatic.com/2013.3.1119/styles/kendo.dataviz.metro.min.css" rel="stylesheet">
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://cdn.kendostatic.com/2013.3.1119/js/kendo.all.min.js"></script><style type="text/css"></style>
+    <script src="http://cdn.kendostatic.com/2013.3.1119/js/kendo.timezones.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    
+        <div id="example" class="file-upload-list">
+            <div class="configuration k-widget k-header">
+                <span class="infoHead">File uploader</span>
+                <p>
+                    Please upload some files, they will be send to the server and remain in this list if you refresh the page.<br>
+                    You can delete them from the server with the remove x on the right.<br>
+                </p>
+                <p>
+                    If you click the circular arrow below the for this list gets cleaned, the files will remain on the server.<br>
+                    See <a href="files.html">the listing</a>.
+                </p>
+            </div>
+            
+            <div>
+                <div class="demo-section">
+                    <input name="files" id="files" type="file" />
+                </div>
+            </div>
+            <em id="iconButton"><span class="k-sprite">Refresh</span></em>
+
+            <script>
+                $(document).ready(function () {
+                    function refreshClick(e) {
+                        // console.log("event :: click (" + $(e.event.target).closest(".k-button").attr("id") + ")" );
+                        sessionStorage.initialFiles = "[]";
+                        location.reload();
+                    }
+
+                    if (sessionStorage.initialFiles === undefined) {
+                        sessionStorage.initialFiles = "[]";
+                    }
+
+                    var initialFiles = JSON.parse(sessionStorage.initialFiles);
+                    // var initialFiles = JSON.parse("[]");
+
+                    $("#files").kendoUpload({
+                        multiple: true,
+                        async: {
+                            saveUrl: "save",
+                            removeUrl: "remove",
+                            autoUpload: true
+                        },
+                        files: initialFiles,
+                        success: onSuccess
+                    });
+
+                    function onSuccess(e) {
+                        var currentInitialFiles = JSON.parse(sessionStorage.initialFiles);
+                        for (var i = 0; i < e.files.length; i++) {
+                            var current = {
+                                name: e.files[i].name,
+                                extension: e.files[i].extension,
+                                size: e.files[i].size
+                            }
+
+                            if (e.operation == "upload") {
+                                currentInitialFiles.push(current);
+                            } else {
+                                var indexOfFile = currentInitialFiles.indexOf(current);
+                                currentInitialFiles.splice(indexOfFile, 1);
+                            }
+                        }
+                        sessionStorage.initialFiles = JSON.stringify(currentInitialFiles);
+                    }
+
+                    $("#iconButton").kendoButton({
+                        spriteCssClass: "k-icon k-i-refresh",
+                        click: refreshClick
+                    });
+
+                });
+            </script>
+        </div>
+
+    <style scoped>
+        .file-upload-list {
+            width: 733px;
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 3px 5px 0 0;
+            line-height: 1.1em;
+            font-size: .9em;
+            font-weight: normal;
+            color: #999;
+        }
+    </style>
+
+</body>
+</html>
