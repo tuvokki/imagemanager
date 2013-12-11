@@ -1,11 +1,13 @@
 var path = require('path'),
-    easyimg = require('easyimage'),
     fs = require('fs');
-var dir=__dirname + '/../public/images/uploaded/';
+var Thumbnail = require('thumbnail');
+var dir=__dirname + '/public/images/uploaded/';
 var targetPath = path.resolve(dir);
 var allowedExt = 'jpg';
-//var fpath='http://localhost:9090/uploaded/';
-var fpath='images/uploaded/';
+var th_width = 140;
+var th_height = 140;
+var thumbdir = 'thumbs';
+var fpath='/images/uploaded/';
 var list = [];
 
 /*
@@ -25,11 +27,14 @@ exports.index = function(req, res) {
            })
            .sort(function(a, b) { return b.time - a.time; }) //reversed a.time - b.time
            .map(function(v) { return v.name; });
-    //console.log('The resulting files-list', files);
+
     files.forEach(function(file){
         if (path.extname(file).toLowerCase() === '.' + allowedExt) {
-            //console.log('Pushing', fpath+file);
-            list.push({'path':fpath+file, 'thpath':fpath+'thumbs/thumb_'+file, name: file.slice(0, -4)});
+            list.push({
+                'path':fpath+file,
+                'thpath':fpath+thumbdir+'/'+file.slice(0, -4)+'-'+th_width+'x'+th_height+'.'+allowedExt,
+                'name': file.slice(0, -4)
+            });
         }
     });
     res.setHeader('Content-Type', 'application/json');
@@ -47,14 +52,15 @@ exports.save = function(req, res){
         return;
     }
     if (path.extname(req.files.files.name).toLowerCase() === '.' + allowedExt) {
-        //console.log("writing to ", targetPath + '/' + req.files.files.name);
+        // var thumbnail = new Thumbnail('/path/to/originals', '/path/to/thumbnails');
+        var thumbnail = new Thumbnail(targetPath, targetPath + '/'+thumbdir);
         fs.rename(tempPath, targetPath + '/' + req.files.files.name, function(err) {
             console.log("err", err);
             // if (err) throw err;
             console.log("Upload completed!");
-            easyimg.resize({src:targetPath + '/' + req.files.files.name, dst:targetPath + '/thumbs/thumb_' + req.files.files.name, width:145, height:145}, function(err, stdout, stderr) {
-              //if (err) throw err;
-              console.log('Resized to 145x145 in: ' + targetPath + '/thumbs/thumb_' + req.files.files.name);
+            thumbnail.ensureThumbnail(req.files.files.name, th_width, th_height, function (err, filename) {
+              // "filename" is the name of the thumb in '/path/to/thumbnails'
+              console.log("Created", filename);
             });
         res.send('');
         });
@@ -65,8 +71,6 @@ exports.save = function(req, res){
         });
         res.send('Only .' + allowedExt + ' files are allowed!');
     }
-
-    // res.render('index', { title: 'Express' });
 };
 
 /*

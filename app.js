@@ -31,7 +31,7 @@ app.use(express.methodOverride());
 app.use(express.cookieParser('fd3e7a04f1a36519fe5c56782f87596c'));
 app.use(express.session());
 app.use(app.router);
-  app.use(require('less-middleware')({ src: __dirname + '/public' }));
+app.use(require('less-middleware')({ src: __dirname + '/public' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only

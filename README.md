@@ -2,9 +2,14 @@
 This is a simple and rudimentary API for managing a directory of files.
 Now it only accepts jpg for the upload.
 
+The thumbnailer uses the [thumbnail](https://npmjs.org/package/thumbnail) package which relies on the [GraphicsMagick](http://www.graphicsmagick.org) Image Processing System. GraphicsMagick is available for virtually any Unix or Unix-like system, including Linux. It also runs under Windows 2000 and later (Windows 2000, XP, Vista, and 7), and MacOS-X.
+
 ## Installation ##
 - Clone git repo
 - run npm install
+- create uploadDir @ __dirname + '/tmp'
+- create imageDir @ __dirname + '/public/images'
+- create thumbDir @ __dirname + '/public/images/thumbs'
 - start (default port 9090)
 - goto url: http://localhost:9090/upload.html
 - upload a couple of jpg files
